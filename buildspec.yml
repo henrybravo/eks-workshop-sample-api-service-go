@@ -7,7 +7,8 @@ phases:
       - curl -sS -o kubectl https://amazon-eks.s3-us-west-2.amazonaws.com/1.10.3/2018-07-26/bin/linux/amd64/kubectl
       - chmod +x ./kubectl ./aws-iam-authenticator
       - export PATH=$PWD/:$PATH
-      - apt-get update && apt-get -y install jq python3-pip python3-dev && pip3 install --upgrade awscli
+      - apt-get update && apt-get -y install jq python3-pip python3-dev && pip3 
+      - pip3 install --upgrade awscli
   pre_build:
       commands:
         - TAG="$REPOSITORY_NAME.$REPOSITORY_BRANCH.$ENVIRONMENT_NAME.$(date +%Y-%m-%d.%H.%M.%S).$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | head -c 8)"
@@ -20,7 +21,7 @@ phases:
 
   post_build:
     commands:
-      - echo 'awscli' && awscli --version
+      - echo 'awscli' && aws --version
       - docker push $REPOSITORY_URI:$TAG
       - CREDENTIALS=$(aws sts assume-role --role-arn $EKS_KUBECTL_ROLE_ARN --role-session-name codebuild-kubectl --duration-seconds 900)
       - echo 'echo CREDENTIALS' && echo ${CREDENTIALS}
